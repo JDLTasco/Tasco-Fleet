@@ -3,29 +3,31 @@ import { query } from "@/lib/db";
 import { getSession, roleAtLeast, ROLE } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const vehicle = await query(
     `SELECT v.*, l.name AS location_name, cl.class AS class_name
      FROM vehicles v
      LEFT JOIN locations l ON l.id = v.location_id
      LEFT JOIN vehicle_classes cl ON cl.id = v.class_id
      WHERE v.id = $1`,
-    [params.id]
+    [id]
   );
   if (!vehicle[0]) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const compliance = await query(`SELECT * FROM vehicle_compliance WHERE vehicle_id = $1`, [params.id]);
+  const compliance = await query(`SELECT * FROM vehicle_compliance WHERE vehicle_id = $1`, [id]);
   const history = await query(
     `SELECT h.transfer_date, h.transferring_depot, l.name AS location_name
      FROM vehicle_location_history h LEFT JOIN locations l ON l.id = h.location_id
      WHERE h.vehicle_id = $1 ORDER BY h.transfer_date DESC LIMIT 20`,
-    [params.id]
+    [id]
   );
 
   return NextResponse.json({ vehicle: vehicle[0], compliance: compliance[0] || null, history });
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getSession();
   if (!roleAtLeast(session, ROLE.DEPOT_MANAGER)) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
@@ -47,9 +49,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
   if (sets.length === 0) return NextResponse.json({ error: "No fields to update" }, { status: 400 });
 
-  vals.push(params.id);
+  vals.push(id);
   await query(`UPDATE vehicles SET ${sets.join(", ")}, updated_at = now() WHERE id = $${vals.length}`, vals);
-  await logAudit("vehicles", params.id, "update", session!.userId, body);
+  await logAudit("vehicles", id, "update", session!.userId, body);
 
   return NextResponse.json({ ok: true });
 }

@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { query } from "@/lib/db";
 
-export default async function VehiclesPage({ searchParams }: { searchParams: { status?: string; q?: string } }) {
-  const status = searchParams.status || "active";
-  const q = searchParams.q || "";
+export const dynamic = "force-dynamic";
+
+export default async function VehiclesPage({ searchParams }: { searchParams: Promise<{ status?: string; q?: string }> }) {
+  const { status: statusParam, q: qParam } = await searchParams;
+  const status = statusParam || "active";
+  const q = qParam || "";
 
   const conditions: string[] = [];
   const params: any[] = [];
