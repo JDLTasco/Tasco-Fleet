@@ -30,6 +30,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   {session.mode === "depot" ? "Depot: " : ""}{depotLabel}
                 </span>
               )}
+              <Link href="/help" style={{ fontSize: 13, color: "#a8c0e8" }}>Help</Link>
               <Link href="/select-view" style={{ fontSize: 13, color: "#a8c0e8" }}>Switch View</Link>
               <form action="/api/auth/logout" method="post">
                 <button type="submit" className="nav-logout">Log out</button>
