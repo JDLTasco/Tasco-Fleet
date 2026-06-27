@@ -26,6 +26,12 @@ export default function ReportsHubPage() {
       description: "Driver listing with licence and DG licence details. Filter by depot, licence type, and expiry status.",
       color: "#e37400",
     },
+    {
+      href: "/reports/kms",
+      title: "Kilometre History",
+      description: "KM readings across the fleet — filter by depot, fleet number, and date range. Track usage over time.",
+      color: "#5f6368",
+    },
   ];
 
   return (

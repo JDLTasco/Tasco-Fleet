@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { logAudit } from "@/lib/audit";
 
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const rows = await query(
+    `SELECT d.*, l.name AS home_location
+     FROM drivers d LEFT JOIN locations l ON l.id = d.home_location_id
+     WHERE d.id = $1`,
+    [id]
+  );
+  if (!rows[0]) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  return NextResponse.json(rows[0]);
+}
+
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const body = await req.json();

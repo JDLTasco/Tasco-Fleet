@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Driver = {
   id: string; driver_code: string; first_name: string; last_name: string;
@@ -137,7 +138,7 @@ export default function DriversPage() {
         <thead>
           <tr>
             <th>Code</th><th>Name</th><th>Phone</th><th>Licence</th><th>Expiry</th>
-            <th>DG Licence</th><th>DG Expiry</th><th>Status</th><th>Depots</th><th>Actions</th>
+            <th>DG Licence</th><th>DG Expiry</th><th>Status</th><th>Depots</th><th>Detail</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -155,6 +156,13 @@ export default function DriversPage() {
                 {d.dg_licence_expiry ? new Date(d.dg_licence_expiry).toLocaleDateString("en-AU") : "—"}
               </td>
               <td><span className={`badge ${d.status === "active" ? "active" : "disposed"}`}>{d.status}</span></td>
+              <td>
+                <Link href={`/drivers/${d.id}`}
+                  style={{ fontSize: 11, padding: "2px 8px", background: "#f0f4fa", color: "#1B3A6B",
+                    border: "1px solid #1B3A6B", borderRadius: 4, textDecoration: "none" }}>
+                  View
+                </Link>
+              </td>
               <td>
                 <button onClick={() => openDepotManager(d.id)}
                   style={{ fontSize: 11, padding: "2px 8px", background: "#eef2f9", color: "#1B3A6B", border: "1px solid #1B3A6B" }}>
