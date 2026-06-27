@@ -32,7 +32,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const fields = [
     "vehicle_type", "sub_type", "make", "model", "description", "year", "vin",
     "tare_kg", "gvm_kg", "gcm_kg", "current_kms", "current_kms_date", "status",
-    "action_required", "action_task", "notes",
+    "action_required", "action_task", "notes", "location_id", "acquired_date",
   ];
   const sets: string[] = [];
   const vals: any[] = [];

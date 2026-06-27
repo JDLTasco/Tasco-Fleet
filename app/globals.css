@@ -1,13 +1,55 @@
 body { font-family: system-ui, -apple-system, sans-serif; margin: 0; color: #1a1a1a; }
-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; font-size: 14px; }
-th { background: #fafafa; }
-input, select, textarea { padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+
+/* Nav */
+.main-nav {
+  display: flex; gap: 20px; padding: 0 20px; background: #1B3A6B;
+  align-items: center; height: 52px;
+}
+.main-nav a { color: #d0dcf0; text-decoration: none; font-size: 14px; }
+.main-nav a:hover { color: #fff; }
+.nav-brand { font-weight: 700; font-size: 15px !important; color: #fff !important; margin-right: 8px; }
+.nav-logout {
+  padding: 5px 12px; background: transparent; color: #d0dcf0;
+  border: 1px solid rgba(255,255,255,0.3); border-radius: 4px;
+  cursor: pointer; font-size: 13px;
+}
+.nav-logout:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; }
+th { background: #f0f4fa; color: #1B3A6B; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+tr:hover td { background: #f8fafd; }
+
+/* Forms */
+input, select, textarea {
+  padding: 7px 9px; border: 1px solid #ccc; border-radius: 5px;
+  font-size: 14px; font-family: inherit; width: 100%; box-sizing: border-box;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: #1B3A6B; box-shadow: 0 0 0 2px rgba(27,58,107,0.15); }
 label { display: block; margin-bottom: 10px; font-size: 13px; color: #444; }
-button { padding: 8px 14px; border-radius: 4px; border: 1px solid #333; background: #1a1a1a; color: #fff; cursor: pointer; font-size: 14px; }
-button:hover { background: #333; }
+
+/* Buttons */
+button {
+  padding: 8px 14px; border-radius: 5px; border: 1px solid #333;
+  background: #1B3A6B; color: #fff; cursor: pointer; font-size: 14px; font-family: inherit;
+}
+button:hover:not(:disabled) { background: #254f96; }
+button:disabled { opacity: 0.5; cursor: default; }
+
+/* Badges */
 .badge { padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
 .badge.active { background: #e6f4ea; color: #137333; }
 .badge.disposed { background: #fce8e6; color: #c5221f; }
+
+/* Sections */
 .section { margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee; }
 .error { color: #c5221f; font-size: 13px; }
+
+/* Print */
+@media print {
+  .main-nav, .no-print { display: none !important; }
+  body { font-size: 11px; }
+  table { font-size: 10px; }
+  th { background: #eee !important; }
+}

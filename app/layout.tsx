@@ -1,22 +1,39 @@
 import "./globals.css";
 import Link from "next/link";
+import { getSession } from "@/lib/auth";
 
 export const metadata = { title: "Tasco Carriers Fleet" };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+  const depotLabel = session?.mode === "depot" && session.depotName
+    ? session.depotName
+    : session ? "Admin" : null;
+
   return (
     <html lang="en">
       <body>
-        <nav style={{ display: "flex", gap: 16, padding: "12px 20px", borderBottom: "1px solid #ddd", alignItems: "center" }}>
-          <strong>Tasco Carriers — Fleet</strong>
-          <Link href="/vehicles">Vehicles</Link>
-          <Link href="/drivers">Drivers</Link>
-          <Link href="/mass-verifications">Mass Verifications</Link>
-          <form action="/api/auth/logout" method="post" style={{ marginLeft: "auto" }}>
-            <button type="submit">Log out</button>
-          </form>
-        </nav>
-        <main style={{ padding: 20, maxWidth: 1100, margin: "0 auto" }}>{children}</main>
+        {session && (
+          <nav className="main-nav">
+            <Link href="/vehicles" className="nav-brand">Tasco Carriers — Fleet</Link>
+            <Link href="/vehicles">Vehicles</Link>
+            <Link href="/drivers">Drivers</Link>
+            <Link href="/mass-verifications">Mass Verifications</Link>
+            <Link href="/reports">Reports</Link>
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
+              {depotLabel && (
+                <span style={{ fontSize: 12, color: "#a8c0e8" }}>
+                  {session.mode === "depot" ? "Depot: " : ""}{depotLabel}
+                </span>
+              )}
+              <Link href="/select-view" style={{ fontSize: 13, color: "#a8c0e8" }}>Switch View</Link>
+              <form action="/api/auth/logout" method="post">
+                <button type="submit" className="nav-logout">Log out</button>
+              </form>
+            </div>
+          </nav>
+        )}
+        <main style={{ padding: 20, maxWidth: 1200, margin: "0 auto" }}>{children}</main>
       </body>
     </html>
   );

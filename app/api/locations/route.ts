@@ -1,0 +1,11 @@
+import { NextResponse } from "next/server";
+import { query } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  const rows = await query<{ id: string; name: string }>(
+    "SELECT id, name FROM locations ORDER BY name"
+  );
+  return NextResponse.json(rows);
+}

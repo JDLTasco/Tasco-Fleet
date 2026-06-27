@@ -1,7 +1,22 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
-export function proxy() {
-  return NextResponse.next();
+const secret = new TextEncoder().encode(process.env.AUTH_SECRET || "dev-secret-change-me");
+const PUBLIC = ["/login", "/api/auth/login"];
+
+export async function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  if (PUBLIC.some((p) => pathname.startsWith(p)) || pathname.startsWith("/_next")) {
+    return NextResponse.next();
+  }
+  const token = req.cookies.get("fleet_session")?.value;
+  if (!token) return NextResponse.redirect(new URL("/login", req.url));
+  try {
+    await jwtVerify(token, secret);
+    return NextResponse.next();
+  } catch {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 }
 
 export const config = {

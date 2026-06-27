@@ -5,10 +5,10 @@ const secret = new TextEncoder().encode(process.env.AUTH_SECRET || "dev-secret-c
 const COOKIE_NAME = "fleet_session";
 
 export type SessionPayload = {
-  userId: string;
   username: string;
-  fullName: string;
-  roleId: number; // 1 Operator, 2 Depot Manager, 3 Administrator
+  mode: "admin" | "depot";
+  depotId?: string;
+  depotName?: string;
 };
 
 export async function createSession(payload: SessionPayload) {
@@ -40,11 +40,4 @@ export async function getSession(): Promise<SessionPayload | null> {
   } catch {
     return null;
   }
-}
-
-/** Role names, matching the `roles` table seeded in schema.sql */
-export const ROLE = { OPERATOR: 1, DEPOT_MANAGER: 2, ADMINISTRATOR: 3 } as const;
-
-export function roleAtLeast(session: SessionPayload | null, minRole: number) {
-  return !!session && session.roleId >= minRole;
 }

@@ -37,9 +37,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "fleet_no is required" }, { status: 400 });
   }
   const rows = await query<{ id: string }>(
-    `INSERT INTO vehicles (fleet_no, vehicle_type, sub_type, make, model, description, year, vin, status)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8, 'active') RETURNING id`,
-    [body.fleet_no, body.vehicle_type, body.sub_type, body.make, body.model, body.description, body.year, body.vin]
+    `INSERT INTO vehicles (fleet_no, vehicle_type, sub_type, make, model, description, year, vin, status, location_id, acquired_date)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'active',$9,$10) RETURNING id`,
+    [body.fleet_no, body.vehicle_type, body.sub_type, body.make, body.model, body.description, body.year, body.vin,
+     body.location_id || null, body.acquired_date || null]
   );
   await query(`INSERT INTO vehicle_compliance (vehicle_id) VALUES ($1)`, [rows[0].id]);
   await logAudit("vehicles", rows[0].id, "insert", null, body);
