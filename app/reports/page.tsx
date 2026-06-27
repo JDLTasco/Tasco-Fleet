@@ -32,6 +32,12 @@ export default function ReportsHubPage() {
       description: "KM readings across the fleet — filter by depot, fleet number, and date range. Track usage over time.",
       color: "#5f6368",
     },
+    {
+      href: "/reports/non-conformances",
+      title: "Non-Conformances",
+      description: "Incidents by date, vehicle, driver, or type (Hours / Vehicle / Other). Export to PDF or CSV.",
+      color: "#c5221f",
+    },
   ];
 
   return (

@@ -22,6 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Link href="/vehicles">Vehicles</Link>
             <Link href="/drivers">Drivers</Link>
             <Link href="/mass-verifications">Mass Verifications</Link>
+            <Link href="/non-conformances">Non-Conformances</Link>
             <Link href="/reports">Reports</Link>
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
               {depotLabel && (
