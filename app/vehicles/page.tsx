@@ -2,7 +2,7 @@ import Link from "next/link";
 import { query } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import VehicleActions from "@/components/VehicleActions";
-import VehicleRowActions from "@/components/VehicleRowActions";
+import VehicleTable from "@/components/VehicleTable";
 
 export const dynamic = "force-dynamic";
 
@@ -107,38 +107,7 @@ export default async function VehiclesPage({
         <a href="/vehicles" style={{ alignSelf: "flex-end", fontSize: 13, color: "#888", textDecoration: "none", paddingBottom: 6 }}>Clear</a>
       </form>
 
-      <p style={{ fontSize: 12, color: "#888", margin: "0 0 8px" }}>{vehicles.length} vehicle{vehicles.length !== 1 ? "s" : ""}</p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Fleet No</th><th>Type</th><th>Make / Model</th>
-            <th>Rego</th><th>Rego Expiry</th><th>Kms</th>
-            <th>Depot</th><th>Status</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {vehicles.map((v: any) => (
-            <tr key={v.id}>
-              <td><Link href={`/vehicles/${v.id}`}>{v.fleet_no}</Link></td>
-              <td>{v.vehicle_type}{v.sub_type ? ` — ${v.sub_type}` : ""}</td>
-              <td>{[v.make, v.model].filter(Boolean).join(" ")}</td>
-              <td>{v.registration_no || "—"}</td>
-              <td>{v.registration_expiry ? new Date(v.registration_expiry).toLocaleDateString("en-AU") : "—"}</td>
-              <td>{v.current_kms?.toLocaleString() || "—"}</td>
-              <td>{v.location_name || "—"}</td>
-              <td><span className={`badge ${v.status}`}>{v.status}</span></td>
-              <td>
-                <VehicleRowActions
-                  vehicleId={v.id} fleetNo={v.fleet_no}
-                  status={v.status} currentDepotId={v.location_id} locations={locations}
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {vehicles.length === 0 && <p style={{ color: "#888", marginTop: 16 }}>No vehicles match this filter.</p>}
+      <VehicleTable vehicles={vehicles as any} locations={locations} />
     </div>
   );
 }

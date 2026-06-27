@@ -35,8 +35,8 @@ export default function NonConformancesPage() {
   }
 
   useEffect(() => {
-    fetch("/api/vehicles").then(r => r.json()).then(setVehicles);
-    fetch("/api/drivers").then(r => r.json()).then(setDrivers);
+    fetch("/api/vehicles?status=active").then(r => r.json()).then(setVehicles);
+    fetch("/api/drivers?status=active").then(r => r.json()).then(setDrivers);
   }, []);
 
   useEffect(() => { load(); }, [filterType, filterVehicle, filterDriver]);

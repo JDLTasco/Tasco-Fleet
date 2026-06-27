@@ -1,6 +1,33 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useColumns } from "@/components/ColumnSelector";
+
+const REPORT_COLS = [
+  { key: "fleet_no",              label: "Fleet No",      always: true },
+  { key: "vehicle_type",          label: "Type" },
+  { key: "sub_type",              label: "Sub Type" },
+  { key: "make",                  label: "Make" },
+  { key: "model",                 label: "Model" },
+  { key: "year",                  label: "Year" },
+  { key: "vin",                   label: "VIN" },
+  { key: "status",                label: "Status" },
+  { key: "location_name",         label: "Depot" },
+  { key: "registration_no",       label: "Rego No" },
+  { key: "registration_state",    label: "Rego State" },
+  { key: "registration_expiry",   label: "Rego Expiry" },
+  { key: "nhvas_mass",            label: "NHVAS Mass" },
+  { key: "mass_active",           label: "Mass Active" },
+  { key: "dg_licence_required",   label: "DG Lic Req" },
+  { key: "dg_expiry_date",        label: "DG Expiry" },
+  { key: "current_kms",           label: "KMs" },
+  { key: "acquired_date",         label: "Acquired" },
+  { key: "acquisition_price",     label: "Acq Price" },
+  { key: "class_name",            label: "Class" },
+  { key: "gvm_kg",                label: "GVM (kg)" },
+  { key: "gcm_kg",                label: "GCM (kg)" },
+  { key: "tare_kg",               label: "Tare (kg)" },
+];
 
 type Location = { id: string; name: string };
 type ReportRow = {
@@ -52,6 +79,9 @@ function downloadCSV(rows: ReportRow[]) {
 }
 
 export default function VehicleReportsPage() {
+  const { visible, toggle, selectAll } = useColumns("vehicle-report-cols", REPORT_COLS);
+  const [colPickerOpen, setColPickerOpen] = useState(false);
+  const col = (key: string) => visible.has(key);
   const [locations, setLocations] = useState<Location[]>([]);
   const [filters, setFilters] = useState({
     depot: "", vehicleType: "", status: "active", make: "", model: "",
@@ -202,6 +232,34 @@ export default function VehicleReportsPage() {
           <div className="export-bar no-print" style={{ marginTop: 20 }}>
             <button className="btn-export btn-pdf" onClick={() => window.print()}>Print / Save PDF</button>
             <button className="btn-export btn-csv" onClick={() => downloadCSV(results)}>Download CSV</button>
+            {/* Column picker */}
+            <div style={{ position: "relative", display: "inline-block", marginLeft: 8 }}>
+              <button onClick={() => setColPickerOpen(o => !o)}
+                style={{ background: "#fff", color: "#1B3A6B", border: "1px solid #1B3A6B", fontSize: 13, padding: "5px 12px" }}>
+                Columns ({REPORT_COLS.filter(c => !c.always && visible.has(c.key)).length + 1}/{REPORT_COLS.length}) ▾
+              </button>
+              {colPickerOpen && (
+                <div style={{
+                  position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 200,
+                  background: "#fff", border: "1px solid #dce6f5", borderRadius: 8,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.15)", padding: "12px 0",
+                  minWidth: 200, maxHeight: 380, overflowY: "auto",
+                }}>
+                  <div style={{ padding: "0 14px 8px", borderBottom: "1px solid #f0f4fa", display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#1B3A6B" }}>Report Columns</span>
+                    <button onClick={() => selectAll()} style={{ fontSize: 11, color: "#1B3A6B", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>All</button>
+                  </div>
+                  {REPORT_COLS.map(c => (
+                    <label key={c.key} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 14px", cursor: c.always ? "default" : "pointer" }}>
+                      <input type="checkbox" checked={visible.has(c.key)} disabled={c.always}
+                        onChange={e => toggle(c.key, e.target.checked)}
+                        style={{ width: 13, height: 13, margin: 0, accentColor: "#1B3A6B" }} />
+                      <span style={{ fontSize: 13, color: c.always ? "#aaa" : "#333" }}>{c.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <p className="print-title" style={{ fontSize: 12, color: "#555", margin: "0 0 8px" }}>
@@ -212,40 +270,57 @@ export default function VehicleReportsPage() {
             <table style={{ fontSize: 12 }}>
               <thead>
                 <tr>
-                  <th>Fleet No</th><th>Type</th><th>Sub Type</th><th>Make</th><th>Model</th>
-                  <th>Year</th><th>VIN</th><th>Status</th><th>Depot</th>
-                  <th>Rego No</th><th>Rego St</th><th>Rego Expiry</th>
-                  <th>NHVAS Mass</th><th>Mass Active</th><th>DG Lic</th><th>DG Expiry</th>
-                  <th>Kms</th><th>Acquired</th><th>Acq Price</th>
-                  <th>Class</th><th>GVM</th><th>GCM</th><th>Tare</th>
+                  <th>Fleet No</th>
+                  {col("vehicle_type")        && <th>Type</th>}
+                  {col("sub_type")            && <th>Sub Type</th>}
+                  {col("make")                && <th>Make</th>}
+                  {col("model")               && <th>Model</th>}
+                  {col("year")                && <th>Year</th>}
+                  {col("vin")                 && <th>VIN</th>}
+                  {col("status")              && <th>Status</th>}
+                  {col("location_name")       && <th>Depot</th>}
+                  {col("registration_no")     && <th>Rego No</th>}
+                  {col("registration_state")  && <th>Rego St</th>}
+                  {col("registration_expiry") && <th>Rego Expiry</th>}
+                  {col("nhvas_mass")          && <th>NHVAS Mass</th>}
+                  {col("mass_active")         && <th>Mass Active</th>}
+                  {col("dg_licence_required") && <th>DG Lic</th>}
+                  {col("dg_expiry_date")      && <th>DG Expiry</th>}
+                  {col("current_kms")         && <th>KMs</th>}
+                  {col("acquired_date")       && <th>Acquired</th>}
+                  {col("acquisition_price")   && <th>Acq Price</th>}
+                  {col("class_name")          && <th>Class</th>}
+                  {col("gvm_kg")              && <th>GVM</th>}
+                  {col("gcm_kg")              && <th>GCM</th>}
+                  {col("tare_kg")             && <th>Tare</th>}
                 </tr>
               </thead>
               <tbody>
                 {results.map((r, i) => (
                   <tr key={i}>
                     <td>{fmt(r.fleet_no)}</td>
-                    <td>{fmt(r.vehicle_type)}</td>
-                    <td>{fmt(r.sub_type)}</td>
-                    <td>{fmt(r.make)}</td>
-                    <td>{fmt(r.model)}</td>
-                    <td>{fmt(r.year)}</td>
-                    <td style={{ fontFamily: "monospace", fontSize: 11 }}>{fmt(r.vin)}</td>
-                    <td><span style={{ padding: "1px 7px", borderRadius: 10, fontSize: 11, fontWeight: 600, background: r.status === "active" ? "#e6f4ea" : "#fce8e6", color: r.status === "active" ? "#137333" : "#c5221f" }}>{r.status}</span></td>
-                    <td>{fmt(r.location_name)}</td>
-                    <td>{fmt(r.registration_no)}</td>
-                    <td>{fmt(r.registration_state)}</td>
-                    <td>{fmtDate(r.registration_expiry)}</td>
-                    <td>{fmt(r.nhvas_mass)}</td>
-                    <td>{fmt(r.mass_active)}</td>
-                    <td>{fmt(r.dg_licence_required)}</td>
-                    <td>{fmtDate(r.dg_expiry_date)}</td>
-                    <td>{fmtNum(r.current_kms)}</td>
-                    <td>{fmtDate(r.acquired_date)}</td>
-                    <td>{r.acquisition_price ? `$${fmtNum(r.acquisition_price)}` : "—"}</td>
-                    <td>{fmt(r.class_name)}</td>
-                    <td>{fmtNum(r.gvm_kg)}</td>
-                    <td>{fmtNum(r.gcm_kg)}</td>
-                    <td>{fmtNum(r.tare_kg)}</td>
+                    {col("vehicle_type")        && <td>{fmt(r.vehicle_type)}</td>}
+                    {col("sub_type")            && <td>{fmt(r.sub_type)}</td>}
+                    {col("make")                && <td>{fmt(r.make)}</td>}
+                    {col("model")               && <td>{fmt(r.model)}</td>}
+                    {col("year")                && <td>{fmt(r.year)}</td>}
+                    {col("vin")                 && <td style={{ fontFamily: "monospace", fontSize: 11 }}>{fmt(r.vin)}</td>}
+                    {col("status")              && <td><span style={{ padding: "1px 7px", borderRadius: 10, fontSize: 11, fontWeight: 600, background: r.status === "active" ? "#e6f4ea" : "#fce8e6", color: r.status === "active" ? "#137333" : "#c5221f" }}>{r.status}</span></td>}
+                    {col("location_name")       && <td>{fmt(r.location_name)}</td>}
+                    {col("registration_no")     && <td>{fmt(r.registration_no)}</td>}
+                    {col("registration_state")  && <td>{fmt(r.registration_state)}</td>}
+                    {col("registration_expiry") && <td>{fmtDate(r.registration_expiry)}</td>}
+                    {col("nhvas_mass")          && <td>{fmt(r.nhvas_mass)}</td>}
+                    {col("mass_active")         && <td>{fmt(r.mass_active)}</td>}
+                    {col("dg_licence_required") && <td>{fmt(r.dg_licence_required)}</td>}
+                    {col("dg_expiry_date")      && <td>{fmtDate(r.dg_expiry_date)}</td>}
+                    {col("current_kms")         && <td>{fmtNum(r.current_kms)}</td>}
+                    {col("acquired_date")       && <td>{fmtDate(r.acquired_date)}</td>}
+                    {col("acquisition_price")   && <td>{r.acquisition_price ? `$${fmtNum(r.acquisition_price)}` : "—"}</td>}
+                    {col("class_name")          && <td>{fmt(r.class_name)}</td>}
+                    {col("gvm_kg")              && <td>{fmtNum(r.gvm_kg)}</td>}
+                    {col("gcm_kg")              && <td>{fmtNum(r.gcm_kg)}</td>}
+                    {col("tare_kg")             && <td>{fmtNum(r.tare_kg)}</td>}
                   </tr>
                 ))}
               </tbody>

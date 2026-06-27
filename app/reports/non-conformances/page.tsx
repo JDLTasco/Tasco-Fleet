@@ -114,8 +114,8 @@ export default function NCReportPage() {
 
   useEffect(() => {
     fetch("/api/locations").then(r => r.json()).then(setLocations);
-    fetch("/api/vehicles").then(r => r.json()).then(setVehicles);
-    fetch("/api/drivers").then(r => r.json()).then(setDrivers);
+    fetch("/api/vehicles?status=active").then(r => r.json()).then(setVehicles);
+    fetch("/api/drivers?status=active").then(r => r.json()).then(setDrivers);
   }, []);
 
   async function generate() {

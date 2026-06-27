@@ -2,12 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { logAudit } from "@/lib/audit";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const status = new URL(req.url).searchParams.get("status");
+  const conditions: string[] = [];
+  const vals: any[] = [];
+  if (status && status !== "all") { vals.push(status); conditions.push(`d.status = $${vals.length}`); }
+  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
   const rows = await query(
     `SELECT d.id, d.driver_code, d.first_name, d.last_name, d.licence_no, d.licence_type,
-            d.licence_expiry, d.dg_licence_no, d.dg_licence_expiry, d.status, l.name AS home_location
+            d.licence_expiry, d.dg_licence_no, d.dg_licence_expiry, d.phone, d.status, l.name AS home_location
      FROM drivers d LEFT JOIN locations l ON l.id = d.home_location_id
-     ORDER BY d.last_name, d.first_name`
+     ${where}
+     ORDER BY d.last_name, d.first_name`,
+    vals
   );
   return NextResponse.json(rows);
 }
