@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+  <!-- Fuel drop / shield icon -->
+  <circle cx="24" cy="24" r="22" fill="#ffffff" opacity="0.15"/>
+  <circle cx="24" cy="24" r="22" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="24" y="31" font-family="system-ui, sans-serif" font-size="22" font-weight="800" fill="#ffffff" text-anchor="middle">T</text>
+  <!-- Company name -->
+  <text x="56" y="18" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#ffffff" letter-spacing="1">TASCO</text>
+  <text x="56" y="34" font-family="system-ui, sans-serif" font-size="10" font-weight="400" fill="#a8c0e8" letter-spacing="2">PETROLEUM</text>
+  <!-- Divider -->
+  <line x1="130" y1="10" x2="130" y2="38" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <!-- Fleet text -->
+  <text x="142" y="20" font-family="system-ui, sans-serif" font-size="9" font-weight="600" fill="#a8c0e8" letter-spacing="1.5">CARRIERS</text>
+  <text x="142" y="33" font-family="system-ui, sans-serif" font-size="9" font-weight="600" fill="#a8c0e8" letter-spacing="1.5">FLEET</text>
+</svg>

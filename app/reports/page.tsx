@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Location = { id: string; name: string };
@@ -110,10 +111,29 @@ export default function ReportsPage() {
       </div>
 
       <div className="no-print">
-        <div style={{ background: "#1B3A6B", color: "#fff", padding: "14px 20px", borderRadius: 8, marginBottom: 20 }}>
-          <h2 style={{ margin: 0, fontSize: 20 }}>Vehicle Reports</h2>
-          <p style={{ margin: "4px 0 0", fontSize: 13, opacity: 0.85 }}>Filter by any combination of fields, then export</p>
+        <div style={{ background: "#1B3A6B", color: "#fff", padding: "14px 20px", borderRadius: 8, marginBottom: 16 }}>
+          <h2 style={{ margin: 0, fontSize: 20 }}>Reports</h2>
+          <p style={{ margin: "4px 0 0", fontSize: 13, opacity: 0.85 }}>Vehicle, driver, and compliance reports</p>
         </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12, marginBottom: 24 }}>
+          {[
+            { href: "/reports/rego", label: "Registration Expiry", desc: "See which rego is expiring soon, filter by depot or state", color: "#e37400" },
+            { href: "/reports/mass-verifications", label: "Mass Verifications", desc: "Weighbridge records by vehicle, depot and date range", color: "#1B3A6B" },
+            { href: "/reports/drivers", label: "Driver Report", desc: "Licence and DG details, filter by depot or licence type", color: "#137333" },
+          ].map(card => (
+            <Link key={card.href} href={card.href} style={{ textDecoration: "none" }}>
+              <div style={{ border: `2px solid ${card.color}`, borderRadius: 8, padding: 16, background: "#fff", cursor: "pointer", transition: "box-shadow .15s" }}
+                onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.12)")}
+                onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: card.color, marginBottom: 4 }}>{card.label}</div>
+                <div style={{ fontSize: 12, color: "#555" }}>{card.desc}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#1B3A6B", marginBottom: 12, borderBottom: "2px solid #1B3A6B", paddingBottom: 6 }}>Vehicle Report — Custom Filters</div>
 
         <form onSubmit={generate}>
           <div className="filter-grid" style={{ marginBottom: 16 }}>

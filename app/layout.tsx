@@ -1,8 +1,9 @@
 import "./globals.css";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
+import Image from "next/image";
 
-export const metadata = { title: "Tasco Carriers Fleet" };
+export const metadata = { title: "Tasco Petroleum — Fleet" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -15,7 +16,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         {session && (
           <nav className="main-nav">
-            <Link href="/vehicles" className="nav-brand">Tasco Carriers — Fleet</Link>
+            <Link href="/vehicles" style={{ display: "flex", alignItems: "center", marginRight: 16 }}>
+              <Image src="/logo.svg" alt="Tasco Petroleum" width={200} height={48} priority />
+            </Link>
             <Link href="/vehicles">Vehicles</Link>
             <Link href="/drivers">Drivers</Link>
             <Link href="/mass-verifications">Mass Verifications</Link>
