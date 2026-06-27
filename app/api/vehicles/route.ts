@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
-import { getSession, roleAtLeast, ROLE } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 
 export async function GET(req: NextRequest) {
@@ -33,10 +32,6 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getSession();
-  if (!roleAtLeast(session, ROLE.DEPOT_MANAGER)) {
-    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
-  }
   const body = await req.json();
   if (!body.fleet_no) {
     return NextResponse.json({ error: "fleet_no is required" }, { status: 400 });
@@ -47,6 +42,6 @@ export async function POST(req: NextRequest) {
     [body.fleet_no, body.vehicle_type, body.sub_type, body.make, body.model, body.description, body.year, body.vin]
   );
   await query(`INSERT INTO vehicle_compliance (vehicle_id) VALUES ($1)`, [rows[0].id]);
-  await logAudit("vehicles", rows[0].id, "insert", session!.userId, body);
+  await logAudit("vehicles", rows[0].id, "insert", null, body);
   return NextResponse.json({ id: rows[0].id }, { status: 201 });
 }

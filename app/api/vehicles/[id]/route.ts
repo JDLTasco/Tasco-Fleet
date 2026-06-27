@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
-import { getSession, roleAtLeast, ROLE } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -28,10 +27,6 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const session = await getSession();
-  if (!roleAtLeast(session, ROLE.DEPOT_MANAGER)) {
-    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
-  }
   const body = await req.json();
 
   const fields = [
@@ -51,7 +46,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   vals.push(id);
   await query(`UPDATE vehicles SET ${sets.join(", ")}, updated_at = now() WHERE id = $${vals.length}`, vals);
-  await logAudit("vehicles", id, "update", session!.userId, body);
+  await logAudit("vehicles", id, "update", null, body);
 
   return NextResponse.json({ ok: true });
 }
