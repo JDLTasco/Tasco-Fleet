@@ -10,12 +10,12 @@ async function run() {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    // Drop old check constraint first (so UPDATEs below won't violate it)
+    await client.query(`ALTER TABLE non_conformances DROP CONSTRAINT IF EXISTS non_conformances_incident_type_check`);
     // Migrate any old type values to closest new equivalent
     await client.query(`UPDATE non_conformances SET incident_type = 'work_hours' WHERE incident_type = 'hours'`);
     await client.query(`UPDATE non_conformances SET incident_type = 'distraction'  WHERE incident_type = 'vehicle'`);
     await client.query(`UPDATE non_conformances SET incident_type = 'admin'        WHERE incident_type = 'other'`);
-    // Drop old check constraint (PostgreSQL auto-names it)
-    await client.query(`ALTER TABLE non_conformances DROP CONSTRAINT IF EXISTS non_conformances_incident_type_check`);
     // Add new constraint with updated types
     await client.query(`
       ALTER TABLE non_conformances
