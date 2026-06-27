@@ -151,7 +151,7 @@ export default function HelpPage() {
           <li style={li}>Click <strong>Non-Conformances</strong> in the navigation bar.</li>
           <li style={li}>Click <strong>+ Add Record</strong>.</li>
           <li style={li}>Select a <strong>Vehicle</strong> and/or <strong>Driver</strong> (at least one is required).</li>
-          <li style={li}>Choose an <strong>Incident Type</strong>: <em>Hours</em>, <em>Vehicle</em>, or <em>Other</em>.</li>
+          <li style={li}>Choose an <strong>Incident Type</strong>: <em>30 Min Rest NC</em>, <em>Admin NC</em>, <em>Work Hours NC</em>, <em>Diary NC</em>, or <em>Distraction</em>.</li>
           <li style={li}>Enter the <strong>Incident Date</strong> and a <strong>Description</strong> (maximum 50 characters — the counter shows how many you have used).</li>
           <li style={li}>Add optional Notes for more detail, then click <strong>Save Record</strong>.</li>
           <li style={li}>Use the filter dropdowns at the top to narrow the list by type, vehicle, or driver.</li>

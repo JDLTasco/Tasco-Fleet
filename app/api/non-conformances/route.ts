@@ -42,8 +42,12 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { vehicle_id, driver_id, incident_type, description, incident_date, notes } = body;
 
+  const VALID_TYPES = ["rest_30", "admin", "work_hours", "diary", "distraction"];
   if (!incident_type || !description || !incident_date) {
     return NextResponse.json({ error: "incident_type, description and incident_date are required" }, { status: 400 });
+  }
+  if (!VALID_TYPES.includes(incident_type)) {
+    return NextResponse.json({ error: "Invalid incident type" }, { status: 400 });
   }
   if (description.length > 50) {
     return NextResponse.json({ error: "Description must be 50 characters or fewer" }, { status: 400 });

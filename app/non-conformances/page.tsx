@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { NC_TYPES, NC_TYPE_MAP } from "@/lib/nc-types";
 
 type NC = {
   id: string; incident_type: string; description: string; incident_date: string;
@@ -9,13 +10,6 @@ type NC = {
 };
 type Vehicle = { id: string; fleet_no: string; make: string; model: string };
 type Driver = { id: string; first_name: string; last_name: string; driver_code: string };
-
-const TYPE_LABELS: Record<string, string> = { hours: "Hours", vehicle: "Vehicle", other: "Other" };
-const TYPE_COLORS: Record<string, { bg: string; color: string }> = {
-  hours:   { bg: "#fef3e2", color: "#e37400" },
-  vehicle: { bg: "#fce8e6", color: "#c5221f" },
-  other:   { bg: "#e8f0fe", color: "#1a73e8" },
-};
 
 export default function NonConformancesPage() {
   const [records, setRecords] = useState<NC[]>([]);
@@ -28,8 +22,6 @@ export default function NonConformancesPage() {
   const [descLen, setDescLen] = useState(0);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
-
-  // Filters
   const [filterType, setFilterType] = useState("");
   const [filterVehicle, setFilterVehicle] = useState("");
   const [filterDriver, setFilterDriver] = useState("");
@@ -76,6 +68,16 @@ export default function NonConformancesPage() {
     load();
   }
 
+  function TypeBadge({ type }: { type: string }) {
+    const t = NC_TYPE_MAP[type];
+    if (!t) return <span>{type}</span>;
+    return (
+      <span style={{ padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 600, background: t.bg, color: t.color, whiteSpace: "nowrap" }}>
+        {t.label}
+      </span>
+    );
+  }
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
@@ -86,7 +88,7 @@ export default function NonConformancesPage() {
         <div style={{ display: "flex", gap: 8 }}>
           <Link href="/reports/non-conformances"
             style={{ fontSize: 13, color: "#1B3A6B", border: "1px solid #1B3A6B", padding: "6px 14px", borderRadius: 5, textDecoration: "none" }}>
-            Report
+            Report &amp; Graphs
           </Link>
           <button onClick={() => setShowForm(!showForm)} style={{ background: "#1B3A6B" }}>
             {showForm ? "Cancel" : "+ Add Record"}
@@ -104,7 +106,7 @@ export default function NonConformancesPage() {
                 <select value={form.vehicle_id} onChange={e => setForm(f => ({ ...f, vehicle_id: e.target.value }))}>
                   <option value="">— None —</option>
                   {vehicles.map((v: any) => (
-                    <option key={v.id} value={v.id}>{v.fleet_no} {v.make} {v.model}</option>
+                    <option key={v.id} value={v.id}>{v.fleet_no}{v.make ? ` — ${v.make}` : ""}{v.model ? ` ${v.model}` : ""}</option>
                   ))}
                 </select>
               </label>
@@ -120,10 +122,8 @@ export default function NonConformancesPage() {
               <label>
                 <span style={{ fontSize: 12, fontWeight: 600, display: "block", marginBottom: 3 }}>Incident Type *</span>
                 <select required value={form.incident_type} onChange={e => setForm(f => ({ ...f, incident_type: e.target.value }))}>
-                  <option value="">— Select —</option>
-                  <option value="hours">Hours</option>
-                  <option value="vehicle">Vehicle</option>
-                  <option value="other">Other</option>
+                  <option value="">— Select type —</option>
+                  {NC_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </label>
               <label>
@@ -132,14 +132,11 @@ export default function NonConformancesPage() {
               </label>
               <label style={{ gridColumn: "span 2" }}>
                 <span style={{ fontSize: 12, fontWeight: 600, display: "block", marginBottom: 3 }}>
-                  Description * <span style={{ fontWeight: 400, color: descLen > 45 ? "#c5221f" : "#888" }}>({descLen}/50 characters)</span>
+                  Description *{" "}
+                  <span style={{ fontWeight: 400, color: descLen > 45 ? "#c5221f" : "#888" }}>({descLen}/50 characters)</span>
                 </span>
-                <input
-                  required value={form.description}
-                  onChange={e => setDesc(e.target.value)}
-                  placeholder="Brief description of the non-conformance"
-                  maxLength={50}
-                />
+                <input required value={form.description} onChange={e => setDesc(e.target.value)}
+                  placeholder="Brief description of the non-conformance" maxLength={50} />
               </label>
             </div>
             <label style={{ marginTop: 8, display: "block" }}>
@@ -160,9 +157,7 @@ export default function NonConformancesPage() {
       <div style={{ display: "flex", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
         <select value={filterType} onChange={e => setFilterType(e.target.value)} style={{ fontSize: 13 }}>
           <option value="">All Types</option>
-          <option value="hours">Hours</option>
-          <option value="vehicle">Vehicle</option>
-          <option value="other">Other</option>
+          {NC_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
         <select value={filterVehicle} onChange={e => setFilterVehicle(e.target.value)} style={{ fontSize: 13 }}>
           <option value="">All Vehicles</option>
@@ -191,16 +186,9 @@ export default function NonConformancesPage() {
           {records.map(r => (
             <tr key={r.id}>
               <td style={{ whiteSpace: "nowrap" }}>{new Date(r.incident_date).toLocaleDateString("en-AU")}</td>
-              <td>
-                <span style={{
-                  padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 600,
-                  ...TYPE_COLORS[r.incident_type],
-                }}>
-                  {TYPE_LABELS[r.incident_type] || r.incident_type}
-                </span>
-              </td>
+              <td><TypeBadge type={r.incident_type} /></td>
               <td>{r.description}</td>
-              <td>{r.fleet_no ? `${r.fleet_no} ${r.make || ""}` : "—"}</td>
+              <td>{r.fleet_no ? `${r.fleet_no}${r.make ? ` ${r.make}` : ""}` : "—"}</td>
               <td>{r.driver_name?.trim() || "—"}</td>
               <td>{r.depot_name || "—"}</td>
               <td style={{ maxWidth: 200, fontSize: 12, color: "#666" }}>{r.notes || "—"}</td>
